@@ -1,4 +1,4 @@
-﻿using Best_Practices.Infraestructure.Factories;
+using Best_Practices.Infraestructure.Factories;
 using Best_Practices.Infraestructure.Singletons;
 using Best_Practices.Models;
 using Best_Practices.Repositories;
@@ -15,19 +15,21 @@ namespace Best_Practices.Controllers
     public class HomeController : Controller
     {
         private readonly ILogger<HomeController> _logger;
-
         private readonly IVehicleRepository _vehicleRepository;
+        private readonly IEnumerable<Creator> _creators;
 
-        public HomeController(IVehicleRepository vehicleRepository, ILogger<HomeController> logger)
+        public HomeController(IVehicleRepository vehicleRepository, IEnumerable<Creator> creators, ILogger<HomeController> logger)
         {
             _vehicleRepository = vehicleRepository;
+            _creators = creators;
             _logger = logger;
         }
 
         public IActionResult Index()
         {
             var model = new HomeViewModel();
-            model.Vehicles = VehicleCollection.Instance.Vehicles;
+            // Corregido para usar el repositorio inyectado en vez del singleton acoplado directamente
+            model.Vehicles = _vehicleRepository.GetVehicles();
             string error = Request.Query.ContainsKey("error") ? Request.Query["error"].ToString() : null;
             ViewBag.ErrorMessage = error;
 
@@ -35,19 +37,15 @@ namespace Best_Practices.Controllers
         }
 
         [HttpGet]
-        public IActionResult AddMustang()
+        public IActionResult AddVehicle(string type)
         {
-            var factory = new FordMustangCreator();
-            var vehicle = factory.Create();
-            _vehicleRepository.AddVehicle(vehicle);
-            return Redirect("/");
-        }
+            var creator = _creators.FirstOrDefault(c => c.ModelKey.Equals(type, System.StringComparison.OrdinalIgnoreCase));
+            if (creator == null)
+            {
+                return Redirect($"/?error=El modelo de vehiculo '{type}' no esta registrado.");
+            }
 
-        [HttpGet]
-        public IActionResult AddExplorer()
-        {
-            var factory = new FordExplorerCreator();
-            var vehicle = factory.Create();
+            var vehicle = creator.Create();
             _vehicleRepository.AddVehicle(vehicle);
             return Redirect("/");
         }

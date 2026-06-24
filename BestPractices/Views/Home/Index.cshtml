@@ -1,4 +1,4 @@
-﻿@model HomeViewModel;
+@model HomeViewModel;
 
 @{
     ViewData["Title"] = "Home Page";
@@ -17,6 +17,7 @@
         <th>Marca</th>
         <th>Modelo</th>
         <th>Color</th>
+        <th>Año</th>
         <th>Gallons</th>
         <th>Status</th>
         <th>Actions</th>
@@ -40,6 +41,9 @@
             @vehicle.Color
         </td>
         <td>
+            @vehicle.Year
+        </td>
+        <td>
             @vehicle.Gas.ToString("N1")
         </td>
         <td>
@@ -61,6 +65,9 @@
         }
     </table>
 
-    <a href="/Home/AddMustang">Add Mustang</a>
-    <a href="/Home/AddExplorer">Add Explorer</a>
+    <div class="mt-3">
+        <a href="/Home/AddVehicle?type=Mustang" class="btn btn-primary mr-2">Add Mustang</a>
+        <a href="/Home/AddVehicle?type=Explorer" class="btn btn-secondary mr-2">Add Explorer</a>
+        <a href="/Home/AddVehicle?type=Escape" class="btn btn-success">Add Escape</a>
+    </div>
 </div>

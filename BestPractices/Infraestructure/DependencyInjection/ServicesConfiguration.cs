@@ -1,10 +1,6 @@
-﻿using Best_Practices.Controllers;
+using Best_Practices.Infraestructure.Factories;
 using Best_Practices.Repositories;
 using Microsoft.Extensions.DependencyInjection;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 
 namespace Best_Practices.Infraestructure.DependencyInjection
 {
@@ -12,7 +8,13 @@ namespace Best_Practices.Infraestructure.DependencyInjection
     {
         public void ConfigureServices(IServiceCollection services)
         {
-            services.AddTransient<IVehicleRepository, MyVehiclesRepository>();
+            // Registrar el repositorio como Singleton para persistir los datos en memoria entre peticiones
+            services.AddSingleton<IVehicleRepository, InMemoryVehicleRepository>();
+
+            // Registrar todas las fábricas concretas (Factory Method)
+            services.AddTransient<Creator, FordMustangCreator>();
+            services.AddTransient<Creator, FordExplorerCreator>();
+            services.AddTransient<Creator, FordEscapeCreator>();
         }
     }
 }
